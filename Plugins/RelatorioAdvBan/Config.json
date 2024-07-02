@@ -1,16 +1,17 @@
 {
-    "ticketsCategory": "1249482432768376923",
+    "ticketsCategory": "1256065940164968531",
     "logsRelatorioAdm": false,
     "rolesApprove": [
-        "1249472615190495373"
+        "1254587829720186982"
     ],
     "mentionsRolesApprove": [
-        "1249472615190495373"
+        "1254587829720186982",
+        "1255984879645229106"
     ],
-    "logsRelatorioTicket": "1256007869967499304",
-    "logsRelatorioAdv": "1255981834630856795",
-    "logsRelatorioDevolucao": "1255981818281463838",
+    "logsRelatorioTicket": "1257512380582330519",
+    "logsRelatorioAdv": "1257512449687425045",
+    "logsRelatorioDevolucao": "1257512499062902854",
     "useCommandRoles": [
-        "1249472615190495373"
+        "1214434799742226432"
     ]
 }
