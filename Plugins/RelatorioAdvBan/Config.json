@@ -1,0 +1,16 @@
+{
+    "ticketsCategory": "1249482432768376923",
+    "logsRelatoioAdm": "1255012918429351997",
+    "rolesApprove": [
+        "1249472615190495373"
+    ],
+    "logsRelatorioTicket": "1256007869967499304",
+    "logsRelatorioAdv": "1255981834630856795",
+    "logsRelatorioDevolucao": "1255981818281463838",
+    "commandRequireRole": [
+        "1249472615190495373"
+    ],
+    "allowedRoles": [
+        "1249472615190495373"
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "select_options": {
+        "tech_support": {
+            "name": "Suporte técnico",
+            "description": "Problemas técnicos, configurações e outros relacionados.",
+            "emoji": "⚙️",
+            "category": "1249482432768376923",
+            "allowed_roles": [
+                "1249472615190495373"
+            ]
+        },
+        "others": {
+            "name": "Outros assuntos",
+            "description": "Dúvidas, parcerias e outros assuntos.",
+            "emoji": "💡",
+            "category": "1257256676667428885",
+            "allowed_roles": [
+                "1249472615190495373"
+            ]
+        }
+    },
+    "transcript_log_channel": "1255012918429351997",
+    "allowedRoles": [
+        "1249472615190495373"
+    ]
+}
