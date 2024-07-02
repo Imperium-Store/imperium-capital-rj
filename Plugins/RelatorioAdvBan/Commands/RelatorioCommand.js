@@ -8,10 +8,10 @@ module.exports = {
     commandBase: {
         slashData: new SlashCommandBuilder()
             .setName("relatorio")
-            .setDescription("[STAFF] Relatório ADV/BAN")
+            .setDescription("[STAFF] Relatorio ADV/BAN")
             .addStringOption(option =>
                 option.setName('denunciado')
-                    .setDescription('Usuário denúnciado')
+                    .setDescription('Usuário denúnciado (menção ou ID)')
                     .setRequired(true))
             .addStringOption(option =>
                 option.setName('punicao')
@@ -19,16 +19,37 @@ module.exports = {
                     .setRequired(true))
             .addStringOption(option =>
                 option.setName('resultado')
-                    .setDescription('resultado')
+                    .setDescription('Resultado')
                     .setRequired(true))
             .addStringOption(option =>
                 option.setName('denunciante')
-                    .setDescription('Usuário que esta denunciando')
+                    .setDescription('Usuário que está denunciando (menção ou ID)')
                     .setRequired(true)),
         allowedRoles: config.useCommandRoles,
         async execute(interaction) {
-            const usuario = interaction.options.getString('denunciado');
-            const denunciante = interaction.options.getString('denunciante');
+            const extractNicknameId = (nickname) => {
+                const nicknameIdMatch = nickname.match(/#(\d+)$/);
+                return nicknameIdMatch ? nicknameIdMatch[1] : '';
+            };
+
+            const formatUser = async (input) => {
+                const mentionMatch = input.match(/<@!?(\d+)>/);
+                if (mentionMatch) {
+                    const userId = mentionMatch[1];
+                    const member = await interaction.guild.members.fetch(userId);
+                    const nickname = member.displayName;
+                    const nicknameId = extractNicknameId(nickname);
+                    return `${member} | ${nicknameId}`;
+                } else if (input.includes('#')) {
+                    const [name, id] = input.split('#');
+                    return `${id.trim()} | ${name.trim()}`;
+                }
+                return input;
+            };
+
+            const usuario = await formatUser(interaction.options.getString('denunciado'));
+            const denunciante = await formatUser(interaction.options.getString('denunciante'));
+
             const punicao = interaction.options.getString('punicao');
             const resultado = interaction.options.getString('resultado');
             const ticket = interaction.channel.name;

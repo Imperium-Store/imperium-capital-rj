@@ -27,7 +27,11 @@ module.exports = {
                 const resolvidoPor = interaction.user.id;
 
                 const database = readDatabase();
-                const tempData = database[interaction.channel.id];
+                const tempData = database[interaction.channel.id] || {};
+                tempData.resolvidoPor = resolvidoPor;
+                database[interaction.channel.id] = tempData;
+                writeDatabase(database);
+
                 const { usuario, punicao, ticket, resultado } = tempData;
 
                 const embed = new EmbedBuilder()
@@ -60,7 +64,12 @@ module.exports = {
                     .setLabel("Reprovar")
                     .setStyle(ButtonStyle.Danger);
 
-                const buttonRow = new ActionRowBuilder().addComponents(approveButton, rejectButton);
+                const cancelButton = new ButtonBuilder()
+                    .setCustomId("cancel-button")
+                    .setLabel("Cancelar")
+                    .setStyle(ButtonStyle.Secondary);
+
+                const buttonRow = new ActionRowBuilder().addComponents(approveButton, rejectButton, cancelButton);
 
                 const mentionRoles = config.mentionsRolesApprove
                     .map((roleId) => `<@&${roleId}>`)
@@ -185,6 +194,26 @@ module.exports = {
                     );
 
                 await interaction.showModal(rejectModal);
+            } else if (interaction.customId === "cancel-button") {
+                const { resolvidoPor } = tempData;
+
+                if (interaction.user.id !== resolvidoPor) {
+                    await interaction.reply({
+                        content: "Você não tem permissão para cancelar este relatório.",
+                        ephemeral: true,
+                    });
+                    return;
+                }
+
+                await interaction.message.delete();
+
+                await interaction.reply({
+                    content: "Relatório cancelado.",
+                    ephemeral: true,
+                });
+
+                delete database[interaction.channel.id];
+                writeDatabase(database);
             }
 
             if (interaction.customId === "relatory-button") {
@@ -234,12 +263,10 @@ ${"``` ```"}
                     const { denunciante } = tempData;
                     const devolucaoChannel = interaction.guild.channels.cache.get(config.logsRelatorioDevolucao);
                     await devolucaoChannel.send({
-                      content:
-                        `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${
-                          mappedObject.Motivo
-                        }\n> SOLICITADO POR: <@${
-                          interaction.user.id
-                        }>\n> PROVAS: ${mappedObject.Provas}\n`,
+                        content:
+                            `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${mappedObject.Motivo
+                            }\n> SOLICITADO POR: <@${interaction.user.id
+                            }>\n> PROVAS: ${mappedObject.Provas}\n`,
                     });
                 }
 
@@ -254,13 +281,7 @@ ${"``` ```"}
                     if (findUser) {
                         const relatorioAdvChannel = interaction.guild.channels.cache.get(config.logsRelatorioAdv);
                         await relatorioAdvChannel.send({
-                          content: `${"``` ```"}\n**APLICADO POR:**${
-                            mappedObject["Resolvidopor"]
-                          }\n**Denunciado:** ${
-                            mappedObject.Denunciado
-                          }\n**Motivo:** ${mappedObject.Motivo}\n**Punição:** ${
-                            mappedObject["Punição"]
-                          }`,
+                            content: `${"``` ```"}\n**Denunciado:** ${mappedObject.Denunciado}\n**Motivo:** ${mappedObject.Motivo}\n**Punição:** ${mappedObject["Punição"]}`,
                         });
                     }
                 }
