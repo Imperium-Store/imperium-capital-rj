@@ -203,6 +203,7 @@ module.exports = {
 
                 const handleTicketReportModel = (data) => {
                     return `
+${"``` ```"}
 **RELATÓRIO DE ADV/BAN**\n
 **DENUNCIADO:** ${data.Denunciado}
 **PUNIÇÃO:** ${data["Punição"]}
@@ -213,7 +214,8 @@ module.exports = {
 **MULTA POR LOOT INDEVIDO:** ${data.MultaporLootIndevido}
 **RESOLVIDO POR:** ${data.Resolvidopor}
 **APROVADO POR:** ${data.Aprovadopor}
-**PROVAS:** ${data.Provas}` + "``` ```";
+**PROVAS:** ${data.Provas}
+`;
                 };
 
                 await reportChannel.send({
@@ -232,7 +234,12 @@ module.exports = {
                     const { denunciante } = tempData;
                     const devolucaoChannel = interaction.guild.channels.cache.get(config.logsRelatorioDevolucao);
                     await devolucaoChannel.send({
-                        content: `**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${mappedObject.Motivo}\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${mappedObject.Provas}\n` + "``` ```",
+                      content:
+                        `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${
+                          mappedObject.Motivo
+                        }\n> SOLICITADO POR: <@${
+                          interaction.user.id
+                        }>\n> PROVAS: ${mappedObject.Provas}\n`,
                     });
                 }
 
@@ -247,7 +254,13 @@ module.exports = {
                     if (findUser) {
                         const relatorioAdvChannel = interaction.guild.channels.cache.get(config.logsRelatorioAdv);
                         await relatorioAdvChannel.send({
-                            content: `**Denunciado:** ${mappedObject.Denunciado}\n**Motivo:** ${mappedObject.Motivo}\n**Punição:** ${mappedObject["Punição"]}` + "``` ```",
+                          content: `${"``` ```"}\n**APLICADO POR:**${
+                            mappedObject["Resolvidopor"]
+                          }\n**Denunciado:** ${
+                            mappedObject.Denunciado
+                          }\n**Motivo:** ${mappedObject.Motivo}\n**Punição:** ${
+                            mappedObject["Punição"]
+                          }`,
                         });
                     }
                 }
