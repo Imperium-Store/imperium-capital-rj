@@ -8,7 +8,7 @@ module.exports = {
     commandBase: {
         slashData: new SlashCommandBuilder()
             .setName("relatorio")
-            .setDescription("[STAFF] Relatorio ADV/BAN")
+            .setDescription("[STAFF] Relatório ADV/BAN")
             .addStringOption(option =>
                 option.setName('denunciado')
                     .setDescription('Usuário denúnciado')
