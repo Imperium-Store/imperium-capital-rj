@@ -218,9 +218,6 @@ module.exports = {
 
             if (interaction.customId === "relatory-button") {
                 const embed = EmbedBuilder.from(interaction.message.embeds[0]);
-
-                const { staff } = tempData;
-
                 const channelLogsAdm = interaction.guild.channels.cache.get(config.logsRelatorioAdm);
                 const reportChannel = interaction.guild.channels.cache.get(config.logsRelatorioTicket);
 
