@@ -49,7 +49,7 @@ module.exports = {
 
             const usuario = await formatUser(interaction.options.getString('denunciado'));
             const denunciante = await formatUser(interaction.options.getString('denunciante'));
-
+ticketsCategory;
             const punicao = interaction.options.getString('punicao');
             const resultado = interaction.options.getString('resultado');
             const ticket = interaction.channel.name;

@@ -4,9 +4,7 @@ module.exports = {
     name: Events.ClientReady,
     async execute(client) {
         const statusList = [
-            { type: ActivityType.Playing, name: "Deex Bot Platform" },
             { type: ActivityType.Playing, name: "Imperium Store" },
-            { type: ActivityType.Watching, name: "Tickets" }
         ];
 
         let currentIndex = 0;

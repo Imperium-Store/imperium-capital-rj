@@ -12,10 +12,6 @@ module.exports = {
                     .setDescription('ID do usuário junto com menção!')
                     .setRequired(true))
             .addStringOption(option =>
-                option.setName('ticket')
-                    .setDescription('Número do ticket')
-                    .setRequired(true))
-            .addStringOption(option =>
                 option.setName('resultado')
                     .setDescription('negada, lupa ou aprovada, a decisão é sua!')
                     .setRequired(true)
@@ -39,13 +35,22 @@ module.exports = {
         allowedRoles: config.useCommandRoles,
         async execute(interaction) {
             const userId = interaction.options.getString('id');
-            const ticketNumber = interaction.options.getString('ticket');
+            const ticketNumber = interaction.channel.name;
             const result = interaction.options.getString('resultado').toLowerCase();
             const revisedPunishment = interaction.options.getString('revisado');
             const proofs = interaction.options.getString('provas');
             const reason = interaction.options.getString('motivo');
 
             let channel, message;
+            
+            const categoryId = config.category;
+            if (interaction.channel.parentId !== categoryId) {
+              await interaction.reply({
+                content: "Você não pode executar este comando aqui!",
+                ephemeral: true,
+              });
+              return;
+            }
 
             if (result === 'negado' || result === 'lupa') {
                 channel = interaction.guild.channels.cache.get(config.channelNegado);
@@ -55,7 +60,13 @@ module.exports = {
                 }
 
                 const resultadoTexto = result === 'negado' ? 'NEGADO' : 'ENVIADO PARA LUPA';
-                message = '``` ```\n' + `> **ID:** ${userId}\n> **TICKET:** ${ticketNumber}\n> **MOTIVO:** ${reason}\n> **RESULTADO:** ${resultadoTexto}\n> **${resultadoTexto === 'NEGADO' ? 'NEGADO' : 'ENVIADO'} POR:** <@${interaction.user.id}>`;
+                message =
+                  "``` ```\n" +
+                  `> **ID:** ${userId}\n> **TICKET:** ${
+                    ticketNumber.split("・")[1] || ticketNumber
+                  }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** ${resultadoTexto}\n> **${
+                    resultadoTexto === "NEGADO" ? "NEGADO" : "ENVIADO"
+                  } POR:** <@${interaction.user.id}>`;
             } else if (result === 'aprovado') {
                 channel = interaction.guild.channels.cache.get(config.channelAprovado);
 
@@ -63,7 +74,13 @@ module.exports = {
                     return interaction.reply({ content: 'Não foi possível encontrar o canal específico para resultados aprovados.', ephemeral: true });
                 }
 
-                message = '``` ```\n' + `> **ID:** ${userId}\n> **TICKET:** ${ticketNumber}\n> **MOTIVO:** ${reason}\n> **RESULTADO:** APROVADO\n> **REVISADO:** ${revisedPunishment}\n> **REVOGADO POR:** <@${interaction.user.id}>\n> **PROVAS:** ${proofs}`;
+                message =
+                  "``` ```\n" +
+                  `> **ID:** ${userId}\n> **TICKET:** ${
+                    ticketNumber.split("・")[1] || ticketNumber
+                  }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** APROVADO\n> **REVISADO:** ${revisedPunishment}\n> **REVOGADO POR:** <@${
+                    interaction.user.id
+                  }>\n> **PROVAS:** ${proofs}`;
             } else {
                 return interaction.reply({ content: 'Resultado inválido fornecido.', ephemeral: true });
             }

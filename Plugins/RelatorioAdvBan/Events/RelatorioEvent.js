@@ -233,7 +233,7 @@ ${"``` ```"}
 **RELATÓRIO DE ADV/BAN**\n
 **DENUNCIADO:** ${data.Denunciado}
 **PUNIÇÃO:** ${data["Punição"]}
-**TICKET:** ${data.Ticket}
+**TICKET:** ${data.Ticket.split("・")[1] || data.Ticket}
 **RESULTADO:** ${data.Resultado}
 **MOTIVO:** ${data.Motivo}
 **ITENS LOOTEADOS:** ${data.ItensLooteados}
@@ -278,7 +278,13 @@ ${"``` ```"}
                     if (findUser) {
                         const relatorioAdvChannel = interaction.guild.channels.cache.get(config.logsRelatorioAdv);
                         await relatorioAdvChannel.send({
-                            content: `${"``` ```"}\n**Denunciado:** ${mappedObject.Denunciado}\n**Motivo:** ${mappedObject.Motivo}\n**Punição:** ${mappedObject["Punição"]}`,
+                          content: `${"``` ```"}\n**Aplicado por:** ${
+                            mappedObject.Resolvidopor
+                          }\n**Denunciado:** ${
+                            mappedObject.Denunciado
+                          }\n**Motivo:** ${mappedObject.Motivo}\n**Punição:** ${
+                            mappedObject["Punição"]
+                          }`,
                         });
                     }
                 }
