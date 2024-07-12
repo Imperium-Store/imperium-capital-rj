@@ -54,6 +54,9 @@ client.once("ready", async () => {
             const guildCommands = await rest.get(Routes.applicationGuildCommands(config.client_id, guildId));
             await Promise.all(guildCommands.map(cmd => rest.delete(Routes.applicationGuildCommand(config.client_id, guildId, cmd.id))));
             await rest.put(Routes.applicationGuildCommands(config.client_id, guildId), { body: client.slashDatas });
+
+            // Evitar rate Limit
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     } catch (error) {
         console.error("Ocorreu um erro durante o registro de comandos: ", error);
