@@ -9,10 +9,20 @@ module.exports = {
       .setDescription("[STAFF] Mostra o ping atual do bot"),
     allowedRoles: config.useCommandRoles,
     async execute(interaction) {
-      interaction.reply({
-        content: `O ping atual do bot é: **${~~interaction.client.ws.ping}**`,
+      const start = Date.now();
+      const message = await interaction.reply({
+        content: "Calculando o ping...",
+        fetchReply: true,
         ephemeral: true
       });
+      const end = Date.now();
+
+      const latency = end - start;
+      const apiPing = interaction.client.ws.ping;
+
+      interaction.editReply({
+        content: `O ping atual do bot é:\nLatência: **${latency}ms**\nAPI: **${apiPing}ms**`
+      });
     },
-  },
+  }
 };
