@@ -72,7 +72,7 @@ module.exports = {
           tempData.resolvidoPor = resolvidoPor;
 
           // TESTE ID
-          const reportId = uuid().split("-")[0];
+          const reportId = uuid().split("-").join('');
 
           const { usuario, punicao, ticket, resultado } = tempData;
 
