@@ -10,7 +10,7 @@ module.exports = {
     allowedRoles: config.useCommandRoles,
     async execute(interaction) {
       const start = Date.now();
-      const message = await interaction.reply({
+      await interaction.reply({
         content: "Calculando o ping...",
         fetchReply: true,
         ephemeral: true
