@@ -2,6 +2,7 @@ const { Client, GatewayIntentBits, Partials, Collection, REST, Routes, EmbedBuil
 const { readdirSync, existsSync } = require("node:fs");
 const path = require("path");
 const config = require("./BotSetup.json");
+const rest = new REST({ version: "10" }).setToken(config.token);
 
 const client = new Client({
     intents: Object.values(GatewayIntentBits),
@@ -42,23 +43,22 @@ pluginFolders.forEach(pluginFolder => {
     }
 });
 
-const rest = new REST({ version: "10" }).setToken(config.token);
-
-(async () => {
+client.once("ready", async () => {
     try {
-        const currentCommands = await rest.get(Routes.applicationGuildCommands(config.client_id, config.guild_id));
-        const currentCommandsJSON = currentCommands.map(cmd => ({ name: cmd.name, description: cmd.description, options: cmd.options }));
-        const newCommandsJSON = client.slashDatas.map(cmd => ({ name: cmd.name, description: cmd.description, options: cmd.options }));
-        const commandsChanged = JSON.stringify(currentCommandsJSON) !== JSON.stringify(newCommandsJSON);
+        const globalCommands = await rest.get(Routes.applicationCommands(config.client_id));
+        await Promise.all(globalCommands.map(cmd => rest.delete(Routes.applicationCommand(config.client_id, cmd.id))));
 
-        if (commandsChanged) {
-            await Promise.all(currentCommands.map(cmd => rest.delete(Routes.applicationGuildCommand(config.client_id, config.guild_id, cmd.id))));
-            await rest.put(Routes.applicationGuildCommands(config.client_id, config.guild_id), { body: client.slashDatas });
+        const guilds = await client.guilds.fetch();
+        for (const guild of guilds.values()) {
+            const guildId = guild.id;
+            const guildCommands = await rest.get(Routes.applicationGuildCommands(config.client_id, guildId));
+            await Promise.all(guildCommands.map(cmd => rest.delete(Routes.applicationGuildCommand(config.client_id, guildId, cmd.id))));
+            await rest.put(Routes.applicationGuildCommands(config.client_id, guildId), { body: client.slashDatas });
         }
     } catch (error) {
         console.error("Ocorreu um erro durante o registro de comandos: ", error);
     }
-})();
+});
 
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
