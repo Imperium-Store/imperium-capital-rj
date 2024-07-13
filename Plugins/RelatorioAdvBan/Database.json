@@ -1,1 +1,51 @@
-{}
+{
+  "1261325519966965790": {
+    "f6f923bd279e4fb6b27ef487d8ad1587": {
+      "usuario": "2",
+      "punicao": "2",
+      "ticket": "ticket・2122",
+      "resultado": "2",
+      "denunciante": "2",
+      "staff": "579769867289362452",
+      "resolvidoPor": "579769867289362452"
+    },
+    "7fd7884236174cdb9f7e101b7084c69b": {
+      "usuario": "1",
+      "punicao": "1",
+      "ticket": "ticket・2122",
+      "resultado": "1",
+      "denunciante": "1",
+      "staff": "579769867289362452",
+      "resolvidoPor": "579769867289362452"
+    },
+    "tempData": {
+      "usuario": "2",
+      "punicao": "2",
+      "ticket": "ticket・2122",
+      "resultado": "2",
+      "denunciante": "2",
+      "staff": "579769867289362452",
+      "resolvidoPor": "579769867289362452"
+    }
+  },
+  "1261325567278710834": {
+    "069bbb758cb34834835b82ea0f4c082a": {
+      "usuario": "5",
+      "punicao": "5",
+      "ticket": "ticket・2222",
+      "resultado": "5",
+      "denunciante": "5",
+      "staff": "579769867289362452",
+      "resolvidoPor": "579769867289362452"
+    },
+    "tempData": {
+      "usuario": "5",
+      "punicao": "5",
+      "ticket": "ticket・2222",
+      "resultado": "5",
+      "denunciante": "5",
+      "staff": "579769867289362452",
+      "resolvidoPor": "579769867289362452"
+    }
+  }
+}
