@@ -22,13 +22,27 @@ module.exports = {
           .setRequired(true)
       )
       .addStringOption((option) =>
-        option.setName("punicao").setDescription("Punição").setRequired(true)
+        option
+          .setName("punicao")
+          .setDescription("Punição")
+          .setRequired(true)
+          .addChoices(
+            { name: 'Advertencia 1', value: 'advertencia_1' },
+            { name: 'Advertencia 2', value: 'advertencia_2' },
+            { name: 'Advertencia Verbal', value: 'advertencia_verbal' },
+            { name: 'Servidor Banido', value: 'servidor_banido' }
+          )
       )
       .addStringOption((option) =>
         option
           .setName("resultado")
-          .setDescription("Resultado")
+          .setDescription("Veredito sobre este ticket")
           .setRequired(true)
+          .addChoices(
+            { name: 'Aprovado', value: 'Aprovado' },
+            { name: 'Negado', value: 'Negado' },
+            { name: 'n/a', value: 'n/a' }
+          )
       )
       .addStringOption((option) =>
         option
@@ -78,6 +92,15 @@ module.exports = {
         return;
       }
 
+      const rolesMap = {
+        advertencia_1: config.role_adv1,
+        advertencia_2: config.role_adv2,
+        advertencia_verbal: config.role_verbal,
+        servidor_banido: config.role_banido
+      };
+
+      const roleMention = `<@&${rolesMap[punicao]}>`;
+
       let database = {};
       if (fs.existsSync(dbPath)) {
         database = JSON.parse(fs.readFileSync(dbPath, "utf8"));
@@ -90,7 +113,7 @@ module.exports = {
         database[interaction.channel.id] = {
           tempData: {
             usuario,
-            punicao,
+            punicao: roleMention,
             ticket,
             resultado,
             denunciante,
@@ -101,7 +124,7 @@ module.exports = {
       } else {
         database[interaction.channel.id].tempData = {
           usuario,
-          punicao,
+          punicao: roleMention,
           ticket,
           resultado,
           denunciante,
@@ -148,4 +171,4 @@ module.exports = {
       await interaction.showModal(modal1);
     },
   },
-};
+}

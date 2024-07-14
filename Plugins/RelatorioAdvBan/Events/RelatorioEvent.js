@@ -196,8 +196,8 @@ module.exports = {
             embeds: [originalEmbed],
             components: [],
           });
-          
-            await interaction.followUp({
+
+          await interaction.followUp({
             content: "Relatório reprovado com sucesso!",
             ephemeral: true,
           });
@@ -289,7 +289,7 @@ module.exports = {
                   .setRequired(true)
               )
             );
-        
+
           await interaction.showModal(rejectModal);
         } else if (
           interaction.customId.split("-").slice(0, -1).join("-") ===
@@ -358,23 +358,24 @@ ${"``` ```"}
           if (config.logsRelatorioAdm)
             await channelLogsAdm.send({ embeds: [embed] });
 
-          if (mappedObject.ItensLooteados.toLowerCase() !== "n/a") {
+          const { denunciante } = tempData;
+
+          if (mappedObject.ItensLooteados.toLowerCase() !== "n/a" && denunciante.toLowerCase() !== "n/a") {
             const itensList = mappedObject.ItensLooteados.split("\n")
               .map((item) => item.trim())
               .filter((item) => item.length > 0)
               .map((item) => `\`${item}\``)
               .join(" ");
 
-            const { denunciante } = tempData;
+
             const devolucaoChannel = interaction.guild.channels.cache.get(
               config.logsRelatorioDevolucao
             );
+
             await devolucaoChannel.send({
-              content: `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${
-                mappedObject.Motivo
-              }\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${
-                mappedObject.Provas
-              }\n`,
+              content: `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${mappedObject.Motivo
+                }\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${mappedObject.Provas
+                }\n`,
             });
           }
 
@@ -394,11 +395,9 @@ ${"``` ```"}
                 config.logsRelatorioAdv
               );
               await relatorioAdvChannel.send({
-                content: `${"``` ```"}\n**Aplicado por:** ${
-                  mappedObject.Resolvidopor
-                }\n**Denunciado:** ${mappedObject.Denunciado}\n**Motivo:** ${
-                  mappedObject.Motivo
-                }\n**Punição:** ${mappedObject["Punição"]}`,
+                content: `${"``` ```"}\n**Aplicado por:** ${mappedObject.Resolvidopor
+                  }\n**Denunciado:** ${mappedObject.Denunciado}\n**Motivo:** ${mappedObject.Motivo
+                  }\n**Punição:** ${mappedObject["Punição"]}`,
               });
             }
           }
