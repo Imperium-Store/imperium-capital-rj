@@ -103,8 +103,7 @@ module.exports = {
         advertencia_1: config.role_adv1,
         advertencia_2: config.role_adv2,
         advertencia_verbal: config.role_verbal,
-        servidor_banido: config.role_banido,
-        n_a: "" // Adiciona a entrada para 'n/a'
+        servidor_banido: config.role_banido
       };
 
       const roleMention = punicao === 'n_a' ? 'n/a' : `<@&${rolesMap[punicao]}>`;
