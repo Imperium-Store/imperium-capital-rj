@@ -26,13 +26,6 @@ module.exports = {
           .setName("punicao")
           .setDescription("Punição")
           .setRequired(true)
-          .addChoices(
-            { name: 'Advertencia 1', value: 'advertencia_1' },
-            { name: 'Advertencia 2', value: 'advertencia_2' },
-            { name: 'Advertencia Verbal', value: 'advertencia_verbal' },
-            { name: 'Servidor Banido', value: 'servidor_banido' },
-            { name: 'n/a', value: 'n_a' }
-          )
       )
       .addStringOption((option) =>
         option
@@ -99,15 +92,6 @@ module.exports = {
         return;
       }
 
-      const rolesMap = {
-        advertencia_1: config.role_adv1,
-        advertencia_2: config.role_adv2,
-        advertencia_verbal: config.role_verbal,
-        servidor_banido: config.role_banido
-      };
-
-      const roleMention = punicao === 'n_a' ? 'n/a' : `<@&${rolesMap[punicao]}>`;
-
       let database = {};
       if (fs.existsSync(dbPath)) {
         database = JSON.parse(fs.readFileSync(dbPath, "utf8"));
@@ -120,7 +104,7 @@ module.exports = {
         database[interaction.channel.id] = {
           tempData: {
             usuario,
-            punicao: roleMention,
+            punicao,
             ticket,
             resultado,
             denunciante,
@@ -134,7 +118,7 @@ module.exports = {
       } else {
         database[interaction.channel.id].tempData = {
           usuario,
-          punicao: roleMention,
+          punicao,
           ticket,
           resultado,
           denunciante,
