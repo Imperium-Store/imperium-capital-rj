@@ -30,7 +30,8 @@ module.exports = {
             { name: 'Advertencia 1', value: 'advertencia_1' },
             { name: 'Advertencia 2', value: 'advertencia_2' },
             { name: 'Advertencia Verbal', value: 'advertencia_verbal' },
-            { name: 'Servidor Banido', value: 'servidor_banido' }
+            { name: 'Servidor Banido', value: 'servidor_banido' },
+            { name: 'n/a', value: 'n_a' }
           )
       )
       .addStringOption((option) =>
@@ -43,12 +44,6 @@ module.exports = {
             { name: 'Negado', value: 'Negado' },
             { name: 'n/a', value: 'n/a' }
           )
-      )
-      .addStringOption((option) =>
-        option
-          .setName("denunciante")
-          .setDescription("Usuário que está denunciando (menção ou ID)")
-          .setRequired(true)
       ),
     allowedRoles: config.useCommandRoles,
     async execute(interaction) {
@@ -72,11 +67,23 @@ module.exports = {
         return input;
       };
 
+      const findDenuncianteId = async () => {
+        const messages = await interaction.channel.messages.fetch({ limit: 50 });
+        for (const message of messages.values()) {
+          const idMatch = message.content.match(/Meu ID:\s*(\d+)/);
+          if (idMatch) {
+            const userId = idMatch[1];
+            const member = await interaction.guild.members.fetch(message.author.id);
+            return `${member} | ${userId}`;
+          }
+        }
+        return null;
+      };
+
+      const denunciante = await findDenuncianteId() || "n/a";
+
       const usuario = await formatUser(
         interaction.options.getString("denunciado")
-      );
-      const denunciante = await formatUser(
-        interaction.options.getString("denunciante")
       );
       const punicao = interaction.options.getString("punicao");
       const resultado = interaction.options.getString("resultado");
@@ -96,10 +103,11 @@ module.exports = {
         advertencia_1: config.role_adv1,
         advertencia_2: config.role_adv2,
         advertencia_verbal: config.role_verbal,
-        servidor_banido: config.role_banido
+        servidor_banido: config.role_banido,
+        n_a: "" // Adiciona a entrada para 'n/a'
       };
 
-      const roleMention = `<@&${rolesMap[punicao]}>`;
+      const roleMention = punicao === 'n_a' ? 'n/a' : `<@&${rolesMap[punicao]}>`;
 
       let database = {};
       if (fs.existsSync(dbPath)) {
@@ -118,6 +126,9 @@ module.exports = {
             resultado,
             denunciante,
             staff,
+            itens_looteados: usuario === 'n/a' ? "n/a" : null,
+            devolver_itens_para: usuario === 'n/a' ? "n/a" : null,
+            multa_loot: usuario === 'n/a' ? "n/a" : null,
           },
           ...database[interaction.channel.id],
         };
@@ -129,6 +140,9 @@ module.exports = {
           resultado,
           denunciante,
           staff,
+          itens_looteados: usuario === 'n/a' ? "n/a" : null,
+          devolver_itens_para: usuario === 'n/a' ? "n/a" : null,
+          multa_loot: usuario === 'n/a' ? "n/a" : null,
         };
       }
 
@@ -136,15 +150,27 @@ module.exports = {
 
       const modal1 = new ModalBuilder()
         .setCustomId("advertencia-modal-1")
-        .setTitle("Relatório de ADV/BAN")
-        .addComponents(
-          new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-              .setCustomId("motivo")
-              .setLabel("Motivo")
-              .setStyle(TextInputStyle.Paragraph)
-              .setRequired(true)
-          ),
+        .setTitle("Relatório de ADV/BAN");
+
+      modal1.addComponents(
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId("motivo")
+            .setLabel("Motivo")
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+        ),
+        new ActionRowBuilder().addComponents(
+          new TextInputBuilder()
+            .setCustomId("provas")
+            .setLabel("Provas")
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+        )
+      );
+
+      if (usuario !== 'n/a') {
+        modal1.addComponents(
           new ActionRowBuilder().addComponents(
             new TextInputBuilder()
               .setCustomId("itens_looteados")
@@ -154,19 +180,21 @@ module.exports = {
           ),
           new ActionRowBuilder().addComponents(
             new TextInputBuilder()
-              .setCustomId("multa_loot")
-              .setLabel("Multa por Loot Indevido")
+              .setCustomId("devolver_itens_para")
+              .setLabel("Devolução de Itens para")
+              .setValue(denunciante)
               .setStyle(TextInputStyle.Short)
               .setRequired(true)
           ),
           new ActionRowBuilder().addComponents(
             new TextInputBuilder()
-              .setCustomId("provas")
-              .setLabel("Provas")
-              .setStyle(TextInputStyle.Paragraph)
+              .setCustomId("multa_loot")
+              .setLabel("Multa por Loot Indevido")
+              .setStyle(TextInputStyle.Short)
               .setRequired(true)
           )
         );
+      }
 
       await interaction.showModal(modal1);
     },

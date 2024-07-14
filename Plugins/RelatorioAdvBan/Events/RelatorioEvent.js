@@ -60,21 +60,37 @@ module.exports = {
       if (interaction.isModalSubmit()) {
         if (interaction.customId === "advertencia-modal-1") {
           const motivo = interaction.fields.getTextInputValue("motivo");
-          const itensLooteados =
-            interaction.fields.getTextInputValue("itens_looteados") || "Nenhum";
-          const multaLoot =
-            interaction.fields.getTextInputValue("multa_loot") || "Nenhuma";
           const provas = interaction.fields.getTextInputValue("provas");
           const resolvidoPor = interaction.user.id;
+
+          let itensLooteados, devolverItensPara, multaLoot;
+
+          // Verifica se os campos opcionais estão presentes
+          if (interaction.fields.fields.find(field => field.customId === "itens_looteados")) {
+            itensLooteados = interaction.fields.getTextInputValue("itens_looteados") || "Nenhum";
+          } else {
+            itensLooteados = "n/a";
+          }
+
+          if (interaction.fields.fields.find(field => field.customId === "devolver_itens_para")) {
+            devolverItensPara = interaction.fields.getTextInputValue("devolver_itens_para") || "Nenhum";
+          } else {
+            devolverItensPara = "n/a";
+          }
+
+          if (interaction.fields.fields.find(field => field.customId === "multa_loot")) {
+            multaLoot = interaction.fields.getTextInputValue("multa_loot") || "Nenhuma";
+          } else {
+            multaLoot = "n/a";
+          }
 
           const database = await readDatabase();
           const tempData = database[interaction.channel.id].tempData || {};
           tempData.resolvidoPor = resolvidoPor;
 
-          // TESTE ID
           const reportId = uuid().split("-").join('');
 
-          const { usuario, punicao, ticket, resultado } = tempData;
+          const { usuario, punicao, ticket, resultado, denunciante } = tempData;
 
           const embed = new EmbedBuilder()
             .setDescription("## Relatório de ADV/BAN")
@@ -84,7 +100,12 @@ module.exports = {
               { name: "Ticket", value: ticket, inline: true },
               { name: "Resultado", value: resultado, inline: false },
               { name: "Motivo", value: motivo, inline: false },
-              { name: "Itens Looteados", value: itensLooteados, inline: false },
+              { name: "Itens Looteados", value: itensLooteados, inline: true },
+              {
+                name: "Devolver Itens Para",
+                value: devolverItensPara,
+                inline: true,
+              },
               {
                 name: "Multa por Loot Indevido",
                 value: `R$ ${multaLoot}`,
@@ -140,14 +161,6 @@ module.exports = {
             embeds: [embed],
             components: [buttonRow],
           });
-
-          //   database[interaction.channel.id] = [
-          //     {
-          //       ...tempData,
-          //       reportId,
-          //     },
-          //     {...database[interaction.channel.id]},
-          //   ];
 
           database[interaction.channel.id] = {
             [reportId]: tempData,
@@ -360,13 +373,12 @@ ${"``` ```"}
 
           const { denunciante } = tempData;
 
-          if (mappedObject.ItensLooteados.toLowerCase() !== "n/a" && denunciante.toLowerCase() !== "n/a") {
+          if (mappedObject.DevolverItensPara.toLowerCase() !== "n/a") {
             const itensList = mappedObject.ItensLooteados.split("\n")
               .map((item) => item.trim())
               .filter((item) => item.length > 0)
               .map((item) => `\`${item}\``)
               .join(" ");
-
 
             const devolucaoChannel = interaction.guild.channels.cache.get(
               config.logsRelatorioDevolucao
@@ -431,4 +443,4 @@ ${"``` ```"}
       });
     }
   },
-};
+}
