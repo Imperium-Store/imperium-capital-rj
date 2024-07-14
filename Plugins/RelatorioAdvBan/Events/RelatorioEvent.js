@@ -63,25 +63,19 @@ module.exports = {
           const provas = interaction.fields.getTextInputValue("provas");
           const resolvidoPor = interaction.user.id;
 
-          let itensLooteados, devolverItensPara, multaLoot;
+          let itensLooteados = "n/a";
+          let devolverItensPara = "n/a";
+          let multaLoot = "n/a";
 
-          // Verifica se os campos opcionais estão presentes
+
           if (interaction.fields.fields.find(field => field.customId === "itens_looteados")) {
-            itensLooteados = interaction.fields.getTextInputValue("itens_looteados") || "Nenhum";
-          } else {
-            itensLooteados = "n/a";
+            itensLooteados = interaction.fields.getTextInputValue("itens_looteados") || "n/a";
           }
-
           if (interaction.fields.fields.find(field => field.customId === "devolver_itens_para")) {
-            devolverItensPara = interaction.fields.getTextInputValue("devolver_itens_para") || "Nenhum";
-          } else {
-            devolverItensPara = "n/a";
+            devolverItensPara = interaction.fields.getTextInputValue("devolver_itens_para") || "n/a";
           }
-
           if (interaction.fields.fields.find(field => field.customId === "multa_loot")) {
-            multaLoot = interaction.fields.getTextInputValue("multa_loot") || "Nenhuma";
-          } else {
-            multaLoot = "n/a";
+            multaLoot = interaction.fields.getTextInputValue("multa_loot") || "n/a";
           }
 
           const database = await readDatabase();
