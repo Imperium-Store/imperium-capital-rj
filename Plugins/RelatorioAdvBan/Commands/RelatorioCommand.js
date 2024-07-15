@@ -60,20 +60,7 @@ module.exports = {
         return input;
       };
 
-      const findDenuncianteId = async () => {
-        const messages = await interaction.channel.messages.fetch({ limit: 50 });
-        for (const message of messages.values()) {
-          const idMatch = message.content.match(/Meu ID:\s*(\d+)/);
-          if (idMatch) {
-            const userId = idMatch[1];
-            const member = await interaction.guild.members.fetch(message.author.id);
-            return `${member} | ${userId}`;
-          }
-        }
-        return null;
-      };
-
-      const denunciante = await findDenuncianteId() || "n/a";
+      const denunciante = "n/a";
 
       const usuario = await formatUser(
         interaction.options.getString("denunciado")
