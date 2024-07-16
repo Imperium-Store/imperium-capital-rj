@@ -67,6 +67,7 @@ module.exports = {
           let devolverItensPara = "n/a";
           let multaLoot = "n/a";
 
+
           if (interaction.fields.fields.find(field => field.customId === "itens_looteados")) {
             itensLooteados = interaction.fields.getTextInputValue("itens_looteados") || "n/a";
           }
@@ -97,7 +98,7 @@ module.exports = {
               { name: "Itens Looteados", value: itensLooteados, inline: true },
               {
                 name: "Devolver Itens Para",
-                value: devolverItensPara.toLowerCase() === "n/a" ? "n/a" : `<@${devolverItensPara}>`,
+                value: `<@${devolverItensPara}>`,
                 inline: true,
               },
               {
@@ -215,7 +216,7 @@ module.exports = {
         const database = await readDatabase();
         const reportId = interaction.customId.split("-").at(-1); // pega o id do relatório pelo btn
         const tempData = database[interaction.channel.id][reportId];
-        if (tempData.devolver_itens_para !== "n/a") {
+        if (tempData.devolver_itens_para !== "n/a"){
           tempData.devolver_itens_para = `<@${tempData.devolver_itens_para}>`;
         }
 
@@ -382,9 +383,11 @@ ${"``` ```"}
             );
 
             await devolucaoChannel.send({
-              content: `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${devolver_itens_para}\n> ITEM: ${itensList}\n> MOTIVO: ${mappedObject.Motivo
-                }\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${mappedObject.Provas
-                }\n`,
+              content: `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${devolver_itens_para}\n> ITEM: ${itensList}\n> MOTIVO: ${
+                mappedObject.Motivo
+              }\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${
+                mappedObject.Provas
+              }\n`,
             });
           }
 
