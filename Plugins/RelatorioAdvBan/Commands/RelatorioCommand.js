@@ -152,6 +152,7 @@ module.exports = {
             new TextInputBuilder()
               .setCustomId("devolver_itens_para")
               .setLabel("Devolução de Itens para")
+              .setPlaceholder("INFORME O ID DE USUÁRIO DO DC")
               .setValue(denunciante)
               .setStyle(TextInputStyle.Short)
               .setRequired(true)

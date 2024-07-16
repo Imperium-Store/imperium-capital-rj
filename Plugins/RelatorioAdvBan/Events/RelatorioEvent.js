@@ -81,6 +81,7 @@ module.exports = {
           const database = await readDatabase();
           const tempData = database[interaction.channel.id].tempData || {};
           tempData.resolvidoPor = resolvidoPor;
+          tempData.devolver_itens_para = devolverItensPara;
 
           const reportId = uuid().split("-").join('');
 
@@ -97,7 +98,7 @@ module.exports = {
               { name: "Itens Looteados", value: itensLooteados, inline: true },
               {
                 name: "Devolver Itens Para",
-                value: devolverItensPara,
+                value: `<@${devolverItensPara}>`,
                 inline: true,
               },
               {
@@ -215,6 +216,9 @@ module.exports = {
         const database = await readDatabase();
         const reportId = interaction.customId.split("-").at(-1); // pega o id do relatório pelo btn
         const tempData = database[interaction.channel.id][reportId];
+        if (tempData.devolver_itens_para !== "n/a"){
+          tempData.devolver_itens_para = `<@${tempData.devolver_itens_para}>`;
+        }
 
         if (
           interaction.customId.split("-").slice(0, -1).join("-") ===
@@ -365,7 +369,7 @@ ${"``` ```"}
           if (config.logsRelatorioAdm)
             await channelLogsAdm.send({ embeds: [embed] });
 
-          const { denunciante } = tempData;
+          const { devolver_itens_para } = tempData;
 
           if (mappedObject.DevolverItensPara.toLowerCase() !== "n/a") {
             const itensList = mappedObject.ItensLooteados.split("\n")
@@ -379,9 +383,11 @@ ${"``` ```"}
             );
 
             await devolucaoChannel.send({
-              content: `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${denunciante}\n> ITEM: ${itensList}\n> MOTIVO: ${mappedObject.Motivo
-                }\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${mappedObject.Provas
-                }\n`,
+              content: `${"``` ```"}\n**:package: SOLICITAR DEVOLUÇÃO **\n\n> ID: ${devolver_itens_para}\n> ITEM: ${itensList}\n> MOTIVO: ${
+                mappedObject.Motivo
+              }\n> SOLICITADO POR: <@${interaction.user.id}>\n> PROVAS: ${
+                mappedObject.Provas
+              }\n`,
             });
           }
 
