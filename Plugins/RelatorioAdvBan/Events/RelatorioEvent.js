@@ -98,7 +98,10 @@ module.exports = {
               { name: "Itens Looteados", value: itensLooteados, inline: true },
               {
                 name: "Devolver Itens Para",
-                value: `<@${devolverItensPara}>`,
+                value:
+                  devolverItensPara !== "n/a"
+                    ? `<@${devolverItensPara}>`
+                    : devolverItensPara,
                 inline: true,
               },
               {
