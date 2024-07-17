@@ -33,13 +33,13 @@ const readDatabase = async () => {
   try {
     if (fs.existsSync(dbPath)) {
       const data = JSON.parse(fs.readFileSync(dbPath, "utf8"));
-      releaseLock();
       return data;
     }
   } catch (error) {
     console.error("Error reading database:", error);
+  } finally {
+    releaseLock();
   }
-  releaseLock();
   return {};
 };
 
@@ -49,8 +49,9 @@ const writeDatabase = async (database) => {
     fs.writeFileSync(dbPath, JSON.stringify(database, null, 2));
   } catch (error) {
     console.error("Error writing to database:", error);
+  } finally {
+    releaseLock();
   }
-  releaseLock();
 };
 
 module.exports = {
@@ -150,6 +151,11 @@ module.exports = {
             .map((roleId) => `<@&${roleId}>`)
             .join(", ");
 
+          await interaction.reply({
+            content: "Relatório enviado, aguarde análise de um superior!",
+            ephemeral: true,
+          });
+
           await interaction.channel.send({
             content: mentionRoles,
             embeds: [embed],
@@ -162,11 +168,6 @@ module.exports = {
           };
 
           await writeDatabase(database);
-
-          await interaction.reply({
-            content: "Relatório enviado, aguarde análise de um superior!",
-            ephemeral: true,
-          });
         }
 
         if (interaction.customId === "reject-modal") {
@@ -433,11 +434,13 @@ ${"``` ```"}
       }
     } catch (error) {
       console.error("Error handling interaction:", error);
-      await interaction.reply({
-        content:
-          "Ocorreu um erro ao processar a interação. Por favor, tente novamente.",
-        ephemeral: true,
-      });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content:
+            "Ocorreu um erro ao processar a interação. Por favor, tente novamente.",
+          ephemeral: true,
+        });
+      }
     }
   },
 }
