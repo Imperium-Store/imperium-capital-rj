@@ -49,10 +49,17 @@ module.exports = {
         const mentionMatch = input.match(/<@!?(\d+)>/);
         if (mentionMatch) {
           const userId = mentionMatch[1];
-          const member = await interaction.guild.members.fetch(userId);
-          const nickname = member.displayName;
-          const nicknameId = extractNicknameId(nickname);
-          return `${member} | ${nicknameId}`;
+          try {
+            const member = await interaction.guild.members.fetch(userId);
+            const nickname = member.displayName;
+            const nicknameId = extractNicknameId(nickname);
+            return `${member} | ${nicknameId}`;
+          } catch (error) {
+            if (error.code === 10007) {
+              return `Usuário denunciado está fora do Discord (ID: ${userId})`;
+            }
+            throw error;
+          }
         } else if (input.includes("#")) {
           const [name, id] = input.split("#");
           return `${id.trim()} | ${name.trim()}`;
