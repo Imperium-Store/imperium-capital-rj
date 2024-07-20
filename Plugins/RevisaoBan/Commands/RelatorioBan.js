@@ -2,14 +2,36 @@ const { SlashCommandBuilder } = require('discord.js');
 const path = require("path");
 const config = require(path.join(__dirname, "..", "Config.json"));
 
+const formatUser = async (interaction, input) => {
+    const mentionMatch = input.match(/<@!?(\d+)>/);
+    if (mentionMatch) {
+        const userId = mentionMatch[1];
+        try {
+            const member = await interaction.guild.members.fetch(userId);
+            const nickname = member.displayName;
+            const nicknameId = nickname.split("#")[1] || "sem ID";
+            return `${member} | ${nicknameId}`;
+        } catch (error) {
+            if (error.code === 10007) {
+                return `Usuário denunciado está fora do Discord (ID: ${userId})`;
+            }
+            throw error;
+        }
+    } else if (input.includes("#")) {
+        const [name, id] = input.split("#");
+        return `${id.trim()} | ${name.trim()}`;
+    }
+    return input;
+};
+
 module.exports = {
     commandBase: {
         slashData: new SlashCommandBuilder()
             .setName("revisao")
             .setDescription("[STAFF] Relatório de revisão")
             .addStringOption(option =>
-                option.setName('id')
-                    .setDescription('ID do usuário junto com menção!')
+                option.setName('discord')
+                    .setDescription('Menção ao usuário ou Nome#123')
                     .setRequired(true))
             .addStringOption(option =>
                 option.setName('resultado')
@@ -34,7 +56,8 @@ module.exports = {
                     .setRequired(true)),
         allowedRoles: config.useCommandRoles,
         async execute(interaction) {
-            const userId = interaction.options.getString('id');
+            const userInput = interaction.options.getString('discord');
+            const formattedUser = await formatUser(interaction, userInput);
             const ticketNumber = interaction.channel.name;
             const result = interaction.options.getString('resultado').toLowerCase();
             const revisedPunishment = interaction.options.getString('revisado');
@@ -42,14 +65,14 @@ module.exports = {
             const reason = interaction.options.getString('motivo');
 
             let channel, message;
-            
+
             const categoryId = config.category;
             if (interaction.channel.parentId !== categoryId) {
-              await interaction.reply({
-                content: "Você não pode executar este comando aqui!",
-                ephemeral: true,
-              });
-              return;
+                await interaction.reply({
+                    content: "Você não pode executar este comando aqui!",
+                    ephemeral: true,
+                });
+                return;
             }
 
             if (result === 'negado' || result === 'lupa') {
@@ -62,7 +85,7 @@ module.exports = {
                 const resultadoTexto = result === 'negado' ? 'NEGADO' : 'ENVIADO PARA LUPA';
                 message =
                   "``` ```\n" +
-                  `> **ID:** ${userId}\n> **TICKET:** ${
+                  `> **ID:** ${formattedUser}\n> **TICKET:** ${
                     ticketNumber.split("・")[1] || ticketNumber
                   }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** ${resultadoTexto}\n> **${
                     resultadoTexto === "NEGADO" ? "NEGADO" : "ENVIADO"
@@ -76,7 +99,7 @@ module.exports = {
 
                 message =
                   "``` ```\n" +
-                  `> **ID:** ${userId}\n> **TICKET:** ${
+                  `> **ID:** ${formattedUser}\n> **TICKET:** ${
                     ticketNumber.split("・")[1] || ticketNumber
                   }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** APROVADO\n> **REVISADO:** ${revisedPunishment}\n> **REVOGADO POR:** <@${
                     interaction.user.id
