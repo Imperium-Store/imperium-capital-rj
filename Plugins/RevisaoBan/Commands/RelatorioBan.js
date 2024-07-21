@@ -13,7 +13,7 @@ const formatUser = async (interaction, input) => {
             return `${member} | ${nicknameId}`;
         } catch (error) {
             if (error.code === 10007) {
-                return `Usuário denunciado está fora do Discord (ID: ${userId})`;
+                return `Usuário está fora do Discord (ID: ${userId})`;
             }
             throw error;
         }
@@ -31,7 +31,7 @@ module.exports = {
             .setDescription("[STAFF] Relatório de revisão")
             .addStringOption(option =>
                 option.setName('discord')
-                    .setDescription('Menção ao usuário ou Nome#123')
+                    .setDescription('Mencione o Discord do usuário que está sendo revisado')
                     .setRequired(true))
             .addStringOption(option =>
                 option.setName('resultado')
@@ -84,12 +84,10 @@ module.exports = {
 
                 const resultadoTexto = result === 'negado' ? 'NEGADO' : 'ENVIADO PARA LUPA';
                 message =
-                  "``` ```\n" +
-                  `> **ID:** ${formattedUser}\n> **TICKET:** ${
-                    ticketNumber.split("・")[1] || ticketNumber
-                  }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** ${resultadoTexto}\n> **${
-                    resultadoTexto === "NEGADO" ? "NEGADO" : "ENVIADO"
-                  } POR:** <@${interaction.user.id}>`;
+                    "``` ```\n" +
+                    `> **ID:** ${formattedUser}\n> **TICKET:** ${ticketNumber.split("・")[1] || ticketNumber
+                    }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** ${resultadoTexto}\n> **${resultadoTexto === "NEGADO" ? "NEGADO" : "ENVIADO"
+                    } POR:** <@${interaction.user.id}>`;
             } else if (result === 'aprovado') {
                 channel = interaction.guild.channels.cache.get(config.channelAprovado);
 
@@ -98,12 +96,10 @@ module.exports = {
                 }
 
                 message =
-                  "``` ```\n" +
-                  `> **ID:** ${formattedUser}\n> **TICKET:** ${
-                    ticketNumber.split("・")[1] || ticketNumber
-                  }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** APROVADO\n> **REVISADO:** ${revisedPunishment}\n> **REVOGADO POR:** <@${
-                    interaction.user.id
-                  }>\n> **PROVAS:** ${proofs}`;
+                    "``` ```\n" +
+                    `> **ID:** ${formattedUser}\n> **TICKET:** ${ticketNumber.split("・")[1] || ticketNumber
+                    }\n> **MOTIVO:** ${reason}\n> **RESULTADO:** APROVADO\n> **REVISADO:** ${revisedPunishment}\n> **REVOGADO POR:** <@${interaction.user.id
+                    }>\n> **PROVAS:** ${proofs}`;
             } else {
                 return interaction.reply({ content: 'Resultado inválido fornecido.', ephemeral: true });
             }
