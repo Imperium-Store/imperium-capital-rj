@@ -79,13 +79,11 @@ module.exports = {
           }
 
           const database = await readDatabase();
-          const tempData = database[interaction.channel.id].tempData || {};
-          tempData.resolvidoPor = resolvidoPor;
-          tempData.devolver_itens_para = devolverItensPara;
+          const channelData = database[interaction.channel.id] || {};
 
           const reportId = uuid().split("-").join('');
 
-          const { usuario, punicao, ticket, resultado, denunciante } = tempData;
+          const { usuario, punicao, ticket, resultado, denunciante, staff } = channelData.tempData;
 
           const embed = new EmbedBuilder()
             .setDescription("## Relatório de ADV/BAN")
@@ -162,29 +160,42 @@ module.exports = {
             components: [buttonRow],
           });
 
-          database[interaction.channel.id] = {
-            [reportId]: tempData,
-            ...database[interaction.channel.id],
+          channelData[reportId] = {
+            usuario,
+            punicao,
+            ticket,
+            resultado,
+            denunciante,
+            staff,
+            itens_looteados: itensLooteados,
+            devolver_itens_para: devolverItensPara,
+            multa_loot: multaLoot,
+            resolvidoPor
           };
+
+          delete channelData.tempData;
+
+          database[interaction.channel.id] = channelData;
 
           await writeDatabase(database);
         }
 
-        if (interaction.customId === "reject-modal") {
-          const reproveReason =
-            interaction.fields.getTextInputValue("reprove_reason");
+        if (interaction.customId.startsWith("reject-modal")) {
+          const reproveReason = interaction.fields.getTextInputValue("reprove_reason");
 
           const database = await readDatabase();
-          const tempData = database[interaction.channel.id];
-          const { staff } = tempData;
+          const reportId = interaction.customId.split("-").at(-1); // pega o id do relatório pelo btn
+          const tempData = database[interaction.channel.id][reportId];
+
+          if (!tempData) {
+            throw new Error(`Relatório ${reportId} não encontrado no canal ${interaction.channel.id}`);
+          }
 
           await interaction.channel.send({
-            content: `### <a:alerta:1256070354732974163> Relatório reprovado pelo seguinte motivo: ${reproveReason}\n||<@${staff}>||`,
+            content: `### <a:alerta:1256070354732974163> Relatório reprovado pelo seguinte motivo: ${reproveReason}\n||<@${tempData.staff}>||`,
           });
 
-          const originalEmbed = EmbedBuilder.from(
-            interaction.message.embeds[0]
-          );
+          const originalEmbed = EmbedBuilder.from(interaction.message.embeds[0]);
 
           if (originalEmbed.data.fields) {
             originalEmbed.data.fields = originalEmbed.data.fields.map(
@@ -238,8 +249,6 @@ module.exports = {
             return;
           }
 
-          const { staff } = tempData;
-
           const embed = EmbedBuilder.from(interaction.message.embeds[0]);
 
           if (embed.data.fields) {
@@ -268,7 +277,7 @@ module.exports = {
           });
 
           await interaction.channel.send({
-            content: `### <a:check_green:1256068819890470964> <@${interaction.user.id}> fez análise do relatório e aprovou. <@${staff}> esta autorizado a finalizar o ticket.`,
+            content: `### <a:check_green:1256068819890470964> <@${interaction.user.id}> fez análise do relatório e aprovou. <@${tempData.staff}> está autorizado a finalizar o ticket.`,
           });
         } else if (
           interaction.customId.split("-").slice(0, -1).join("-") ===
@@ -289,7 +298,7 @@ module.exports = {
           }
 
           const rejectModal = new ModalBuilder()
-            .setCustomId("reject-modal")
+            .setCustomId(`reject-modal-${reportId}`)
             .setTitle("Reprovar relatório")
             .addComponents(
               new ActionRowBuilder().addComponents(
@@ -306,9 +315,7 @@ module.exports = {
           interaction.customId.split("-").slice(0, -1).join("-") ===
           "cancel-button"
         ) {
-          const { resolvidoPor } = tempData;
-
-          if (interaction.user.id !== resolvidoPor) {
+          if (interaction.user.id !== tempData.resolvidoPor) {
             await interaction.reply({
               content: "Você não tem permissão para cancelar este relatório.",
               ephemeral: true,
@@ -322,9 +329,6 @@ module.exports = {
             content: "Relatório cancelado.",
             ephemeral: true,
           });
-
-          delete database[interaction.channel.id][reportId];
-          await writeDatabase(database);
         }
 
         if (
@@ -417,12 +421,6 @@ ${"``` ```"}
             components: [],
           });
 
-          if (Object.keys(database[interaction.channel.id]).length <= 2) {
-            delete database[interaction.channel.id];
-          } else {
-            delete database[interaction.channel.id][reportId];
-          }
-
           await writeDatabase(database);
 
           await interaction.followUp({
@@ -442,5 +440,5 @@ ${"``` ```"}
         });
       }
     }
-  },
+  }
 }
