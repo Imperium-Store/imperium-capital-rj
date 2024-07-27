@@ -12,10 +12,7 @@ const formatUser = async (interaction, input) => {
             const nicknameId = nickname.split("#")[1] || "sem ID";
             return `${member} | ${nicknameId}`;
         } catch (error) {
-            if (error.code === 10007) {
-                return `Usuário está fora do Discord (ID: ${userId})`;
-            }
-            throw error;
+            return input;
         }
     } else if (input.includes("#")) {
         const [name, id] = input.split("#");
