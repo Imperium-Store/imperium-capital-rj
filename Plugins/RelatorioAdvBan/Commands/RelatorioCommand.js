@@ -55,10 +55,7 @@ module.exports = {
             const nicknameId = extractNicknameId(nickname);
             return `${member} | ${nicknameId}`;
           } catch (error) {
-            if (error.code === 10007) {
-              return `Usuário denunciado está fora do Discord (ID: ${userId})`;
-            }
-            throw error;
+            return input;
           }
         } else if (input.includes("#")) {
           const [name, id] = input.split("#");
