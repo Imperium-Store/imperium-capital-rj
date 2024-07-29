@@ -73,16 +73,23 @@ client.on("interactionCreate", async interaction => {
     }
 
     const allowedRoles = command.allowedRoles || [];
+    const allowedUsers = command.allowedUsers || [];
     const userRoles = interaction.member.roles.cache;
     const hasPermission = allowedRoles.some(role => userRoles.has(role));
+    const hasUser = allowedUsers.includes(interaction.user.id);
 
     if (!hasPermission) {
+      if (!hasUser) {
         const noPermissionEmbed = new EmbedBuilder()
-            .setColor(0xff0000)
-            .setDescription("## Você não tem permissão para usar este comando!");
+          .setColor(0xff0000)
+          .setDescription("## Você não tem permissão para usar este comando!");
 
-        await interaction.reply({ embeds: [noPermissionEmbed], ephemeral: true });
+        await interaction.reply({
+          embeds: [noPermissionEmbed],
+          ephemeral: true,
+        });
         return;
+      }
     }
 
     try {
