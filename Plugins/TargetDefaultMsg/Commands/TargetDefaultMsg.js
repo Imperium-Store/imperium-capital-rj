@@ -67,14 +67,6 @@ module.exports = {
 				})
 			);
 
-			// searchUserToRole.members;
-			// createModelMsg({
-			// 	channelname: channelSelected.name,
-			// 	userid: "579769867289362452",
-			// 	ismention: true,
-			// 	date: date,
-			// })
-
 			console.log(
 				
 			);
@@ -82,13 +74,13 @@ module.exports = {
 			await interaction.reply({
 				content: `
 				## USUÁRIOS COM CARGO <@&${role}>
-				${searchUserToRole.map((data) => `\n<@${data.user.id}>`).join("\n")}
+				${searchUserToRole.map((data) => `\n<@${data.user.id}>`).join(" ")}
 				
 				\n## ID USUÁRIOS COM CARGO <@&${role}>
-				${searchUserToRole
-					.map((data) => `${"```"} ${data.user.id} ${"```"}`)
-					.join("\n")}
-
+				${"```"}
+				\n${searchUserToRole.map((data) => `${data.user.id}`).join("\n")}
+				${"```"}
+				
 				\n## BASE PARA PESQUISA DE METAS <@&${role}>
 				${msgCopy.join("\n")}
 				`,
